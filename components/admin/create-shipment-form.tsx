@@ -33,6 +33,7 @@ interface ShipmentFormData {
   senderAddress: string;
   senderCity: string;
   senderState: string;
+  senderCountry: string;
   senderPostalCode: string;
 
   // Recipient info
@@ -42,6 +43,7 @@ interface ShipmentFormData {
   recipientAddress: string;
   recipientCity: string;
   recipientState: string;
+  recipientCountry: string;
   recipientPostalCode: string;
 
   // Package details
@@ -71,6 +73,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
     senderAddress: user?.address || "",
     senderCity: user?.city || "",
     senderState: user?.state || "",
+    senderCountry: user?.country || "",
     senderPostalCode: user?.postal_code || "",
     recipientName: "",
     recipientEmail: "",
@@ -78,6 +81,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
     recipientAddress: "",
     recipientCity: "",
     recipientState: "",
+    recipientCountry: "",
     recipientPostalCode: "",
     packageType: "",
     weightKg: "",
@@ -142,7 +146,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
           sender_city: formData.senderCity,
           sender_state: formData.senderState,
           sender_postal_code: formData.senderPostalCode,
-          sender_country: "US",
+          sender_country: formData.senderCountry,
           recipient_name: formData.recipientName,
           recipient_email: formData.recipientEmail,
           recipient_phone: formData.recipientPhone,
@@ -150,7 +154,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
           recipient_city: formData.recipientCity,
           recipient_state: formData.recipientState,
           recipient_postal_code: formData.recipientPostalCode,
-          recipient_country: "US",
+          recipient_country: formData.recipientCountry,
           package_type: formData.packageType,
           weight_kg: Number.parseFloat(formData.weightKg),
           length_cm: formData.lengthCm ? Number.parseFloat(formData.lengthCm) : null,
@@ -219,7 +223,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
   }, [user]);
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl mx-auto">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           {[1, 2, 3].map((stepNumber) => (
@@ -297,6 +301,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
                         id="senderEmail"
                         type="email"
                         value={formData.senderEmail}
+                        placeholder="optional"
                         onChange={(e) => updateFormData("senderEmail", e.target.value)}
                       />
                     </div>
@@ -306,6 +311,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
                     <Input
                       id="senderPhone"
                       type="tel"
+                      required
                       value={formData.senderPhone}
                       onChange={(e) => updateFormData("senderPhone", e.target.value)}
                     />
@@ -314,7 +320,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
                     <Label htmlFor="senderAddress">Address</Label>
                     <Input
                       id="senderAddress"
-                      required
+                      placeholder="optional"
                       value={formData.senderAddress}
                       onChange={(e) => updateFormData("senderAddress", e.target.value)}
                     />
@@ -324,7 +330,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
                       <Label htmlFor="senderCity">City</Label>
                       <Input
                         id="senderCity"
-                        required
+                        placeholder="optional"
                         value={formData.senderCity}
                         onChange={(e) => updateFormData("senderCity", e.target.value)}
                       />
@@ -339,10 +345,19 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
                       />
                     </div>
                     <div>
+                      <Label htmlFor="senderCountry">Country</Label>
+                      <Input
+                        id="senderState"
+                        required
+                        value={formData.senderCountry}
+                        onChange={(e) => updateFormData("senderCountry", e.target.value)}
+                      />
+                    </div>
+                    <div>
                       <Label htmlFor="senderPostalCode">ZIP Code</Label>
                       <Input
                         id="senderPostalCode"
-                        required
+                        placeholder="optional"
                         value={formData.senderPostalCode}
                         onChange={(e) => updateFormData("senderPostalCode", e.target.value)}
                       />
@@ -411,6 +426,15 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
                       />
                     </div>
                     <div>
+                      <Label htmlFor="recipientCountry">Country</Label>
+                      <Input
+                        id="recipientCountry"
+                        required
+                        value={formData.recipientCountry}
+                        onChange={(e) => updateFormData("recipientCountry", e.target.value)}
+                      />
+                    </div>
+                    <div>
                       <Label htmlFor="recipientPostalCode">ZIP Code</Label>
                       <Input
                         id="recipientPostalCode"
@@ -443,7 +467,7 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
               <CardDescription>Describe your package for accurate pricing</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="overflow-y-auto max-h-[40vh]">
+              <div className="overflow-y-auto max-h-[40vh] space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="packageType">Package Type</Label>
