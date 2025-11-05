@@ -1,8 +1,8 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -10,8 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -19,21 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { createClient } from "@/lib/supabase/client";
-import {
-  Delete,
-  Download,
-  Edit,
-  Eye,
-  FileText,
-  Package,
-  Search,
-} from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { PaymentOption } from "../guest/tracking-history";
-import { ShipmentDetailView } from "./shipment-detail-view";
+import {Textarea} from "@/components/ui/textarea";
+import {createClient} from "@/lib/supabase/client";
+import {Delete, Edit, Package, Search} from "lucide-react";
+import {useEffect, useState} from "react";
+import {PaymentOption} from "../guest/tracking-history";
+import {ShipmentDetailView} from "./shipment-detail-view";
+import ShipmentEditPage from "./shipmet-detail-edit";
 
 interface ShipmentWithUser {
   id: string;
@@ -54,16 +46,15 @@ interface ShipmentWithUser {
 
 export function AdminShipmentsTable() {
   const [shipments, setShipments] = useState<ShipmentWithUser[]>([]);
-  const [filteredShipments, setFilteredShipments] = useState<
-    ShipmentWithUser[]
-  >([]);
+  const [filteredShipments, setFilteredShipments] = useState<ShipmentWithUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedShipment, setSelectedShipment] =
-    useState<ShipmentWithUser | null>(null);
+  const [selectedShipment, setSelectedShipment] = useState<ShipmentWithUser | null>(null);
+  const [selectedShipment2, setSelectedShipment2] = useState<ShipmentWithUser | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [eventDescription, setEventDescription] = useState("");
@@ -86,18 +77,18 @@ export function AdminShipmentsTable() {
     const supabase = createClient();
 
     // 1️⃣ Get the latest tracking event for this shipment
-    const { data: latestEvent, error: eventError } = await supabase
+    const {data: latestEvent, error: eventError} = await supabase
       .from("tracking_events")
       .select("id")
       .eq("shipment_id", shipmentId)
-      .order("created_at", { ascending: false })
+      .order("created_at", {ascending: false})
       .limit(1)
       .maybeSingle();
 
     if (eventError || !latestEvent) return null;
 
     // 2️⃣ Get payment data for that event
-    const { data: payments, error: paymentError } = await supabase
+    const {data: payments, error: paymentError} = await supabase
       .from("tracking_event_payments")
       .select("amount, payment_method")
       .eq("tracking_event_id", latestEvent.id)
@@ -111,10 +102,10 @@ export function AdminShipmentsTable() {
   const fetchPaymentOptions = async () => {
     const supabase = createClient();
     try {
-      const { data, error } = await supabase
+      const {data, error} = await supabase
         .from("payment_options")
         .select("*")
-        .order("created_at", { ascending: true });
+        .order("created_at", {ascending: true});
 
       if (error) throw error;
 
@@ -127,7 +118,7 @@ export function AdminShipmentsTable() {
   const fetchShipments = async () => {
     try {
       const supabase = createClient();
-      const { data, error } = await supabase
+      const {data, error} = await supabase
         .from("shipments")
         .select(
           `*,
@@ -137,7 +128,7 @@ export function AdminShipmentsTable() {
           )
         `
         )
-        .order("created_at", { ascending: false });
+        .order("created_at", {ascending: false});
 
       if (error) throw error;
       setShipments(data || []);
@@ -154,28 +145,16 @@ export function AdminShipmentsTable() {
     if (searchTerm) {
       filtered = filtered.filter(
         (shipment) =>
-          shipment.tracking_number
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          shipment.recipient_name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          shipment.sender_name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          shipment.profiles?.full_name
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          shipment.profiles?.email
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase())
+          shipment.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          shipment.recipient_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          shipment.sender_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          shipment.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          shipment.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (statusFilter !== "all") {
-      filtered = filtered.filter(
-        (shipment) => shipment.status === statusFilter
-      );
+      filtered = filtered.filter((shipment) => shipment.status === statusFilter);
     }
 
     setFilteredShipments(filtered);
@@ -187,7 +166,7 @@ export function AdminShipmentsTable() {
     try {
       const supabase = createClient();
 
-      const { error } = await supabase.rpc("create_tracking_event", {
+      const {error} = await supabase.rpc("create_tracking_event", {
         p_shipment_id: selectedShipment.id,
         p_event_type: newStatus,
         p_event_description: eventDescription,
@@ -216,10 +195,7 @@ export function AdminShipmentsTable() {
     try {
       const supabase = createClient();
       // Delete shipment
-      const { error } = await supabase
-        .from("shipments")
-        .delete()
-        .eq("id", selectedShipment?.id);
+      const {error} = await supabase.from("shipments").delete().eq("id", selectedShipment?.id);
 
       if (error) throw error;
 
@@ -296,9 +272,7 @@ export function AdminShipmentsTable() {
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="created">Created</SelectItem>
                 <SelectItem value="in_transit">In Transit</SelectItem>
-                <SelectItem value="out_for_delivery">
-                  Out for Delivery
-                </SelectItem>
+                <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
                 <SelectItem value="delivered">Delivered</SelectItem>
                 <SelectItem value="exception">Exception</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -306,129 +280,62 @@ export function AdminShipmentsTable() {
             </Select>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-scroll">
           {filteredShipments.length > 0 ? (
             <div className="space-y-4">
               {filteredShipments.map((shipment) => (
                 <div
+                  onClick={() => {
+                    setSelectedShipment(shipment);
+                    setSelectedShipment2(shipment);
+                    setDetailsDialogOpen(true);
+                  }}
                   key={shipment.id}
-                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                >
+                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div className="bg-red-100 p-2 rounded-lg">
                         <Package className="h-4 w-4 text-red-600" />
                       </div>
                       <div>
-                        <p className="font-medium">
-                          {shipment.tracking_number}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          User: {shipment.profiles?.full_name || "Guest"} (
-                          {shipment.profiles?.email || "N/A"})
+                        <p className="font-medium">{shipment.tracking_number}</p>
+                        <p
+                          className="text-sm text-gray-600"
+                          title={
+                            shipment.profiles
+                              ? `${shipment.profiles.full_name || ""}${
+                                  shipment.profiles.full_name ? " — " : ""
+                                }${shipment.profiles.email || ""}`
+                              : "Guest"
+                          }>
+                          User:{" "}
+                          {(() => {
+                            const email = shipment.profiles?.email;
+                            if (!email) return "Guest";
+                            const [local, domain] = email.split("@");
+                            if (!domain) return email;
+                            const maxLocal = 4;
+                            const shortLocal =
+                              local.length <= maxLocal ? local : `${local.slice(0, maxLocal)}...`;
+                            return `${shortLocal}@${domain}`;
+                          })()}
                         </p>
                         <p className="text-sm text-gray-600">
                           {shipment.sender_name} → {shipment.recipient_name}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {shipment.recipient_city}, {shipment.recipient_state}{" "}
-                          • {new Date(shipment.created_at).toLocaleDateString()}
+                          {shipment.recipient_city}, {shipment.recipient_state} •{" "}
+                          {new Date(shipment.created_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
-                    <div className="inline-flex space-x-2">
-                      <Button
-                        asChild
-                        variant="outline"
-                        size="sm"
-                        title="Download Receipt"
-                      >
-                        <Link href={`/admin/shipments/${shipment.id}/receipt`}>
-                          <Download className="h-4 w-4 mr-1" />
-                          Receipt
-                        </Link>
-                      </Button>
-                      <Button
-                        asChild
-                        variant="outline"
-                        size="sm"
-                        title="Download Invoice"
-                      >
-                        <Link href={`/admin/shipments/${shipment.id}/invoice`}>
-                          <FileText className="h-4 w-4 mr-1" />
-                          Invoice
-                        </Link>
-                      </Button>
-                    </div>
 
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <Badge className={getStatusColor(shipment.status)}>
-                          {formatStatus(shipment.status)}
-                        </Badge>
-                        <p className="text-sm font-medium mt-1">
-                          ${shipment.total_cost.toFixed(2)}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {formatStatus(shipment.service_type)}
-                        </p>
-                      </div>
-
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          title="view shipment details"
-                          onClick={() => {
-                            setSelectedShipment(shipment);
-                            setDetailsDialogOpen(true);
-                          }}
-                          className="p-1 h-7 w-7 flex items-center justify-center bg-blue-100 hover:bg-blue-200 border-blue-300 text-blue-700"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          title="update shipment"
-                          translate="yes"
-                          onClick={async () => {
-                            setSelectedShipment(shipment);
-                            setNewStatus(shipment.status);
-                            setUpdateDialogOpen(true);
-                            setError(null);
-
-                            // 🪄 Fetch default payment data for this shipment
-                            const payments =
-                              await fetchLatestPaymentForShipment(shipment.id);
-                            if (payments) {
-                              setPaymentMethods(payments.payment_method || []);
-                              setPaymentAmount(payments.amount || null);
-                            } else {
-                              setPaymentMethods([]);
-                              setPaymentAmount(null);
-                            }
-                          }}
-                          className="p-1 h-7 w-7 flex items-center justify-center bg-green-100 hover:bg-green-200 border-green-300 text-green-700"
-                          aria-label="Update"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          title="delete shipment"
-                          className="p-1 h-7 w-7 flex items-center justify-center bg-red-100 hover:bg-red-200 border-red-300 text-red-700"
-                          onClick={() => {
-                            setDeleteDialogOpen(true);
-                            setSelectedShipment(shipment);
-                          }}
-                        >
-                          <Delete className="h-4 w-4" />
-                        </Button>
-                      </div>
+                    <div className="text-right">
+                      <Badge className={getStatusColor(shipment.status)}>
+                        {formatStatus(shipment.status)}
+                      </Badge>
+                      <p className="text-sm font-medium mt-1">${shipment.total_cost.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500">{formatStatus(shipment.service_type)}</p>
                     </div>
                   </div>
                 </div>
@@ -445,8 +352,7 @@ export function AdminShipmentsTable() {
                     setSearchTerm("");
                     setStatusFilter("all");
                   }}
-                  className="mt-4"
-                >
+                  className="mt-4">
                   Clear Filters
                 </Button>
               ) : null}
@@ -457,16 +363,80 @@ export function AdminShipmentsTable() {
 
       {/* Shipment Details Dialog */}
       <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
-        <DialogContent className="min-w-4xl">
+        <DialogContent className="w-full md:min-w-4xl">
           <DialogHeader>
             <DialogTitle>Shipment Details</DialogTitle>
           </DialogHeader>
 
           {selectedShipment && (
-            <div className="w-full max-h-[90vh] overflow-y-auto">
+            <div className="w-full max-h-[80vh] overflow-y-auto">
               <ShipmentDetailView shipmentId={selectedShipment.id} />
             </div>
           )}
+
+          <div className="flex flex-wrap space-y-4 space-x-4">
+            <Button
+              variant="outline"
+              size="sm"
+              title="update shipment"
+              className="p-1 w-max float-right bg-transparent hover:bg-green-200 border-green-300 text-green-700"
+              onClick={() => {
+                setEditDialogOpen(true);
+                setSelectedShipment(selectedShipment2);
+              }}>
+              <Edit className="h-4 w-4" />
+              Update Shipment
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              title="update tracking event"
+              onClick={async () => {
+                setSelectedShipment(selectedShipment);
+                setNewStatus(selectedShipment?.status!);
+                setUpdateDialogOpen(true);
+                setError(null);
+
+                // 🪄 Fetch default payment data for this shipment
+                const payments = await fetchLatestPaymentForShipment(selectedShipment?.id!);
+                if (payments) {
+                  setPaymentMethods(payments.payment_method || []);
+                  setPaymentAmount(payments.amount || null);
+                } else {
+                  setPaymentMethods([]);
+                  setPaymentAmount(null);
+                }
+              }}
+              className="p-1 w-max float-right bg-green-100 hover:bg-green-200 border-green-300 text-green-700"
+              aria-label="Update">
+              <Edit className="h-4 w-4" />
+              Update Event
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              title="delete shipment"
+              className="p-1 w-max bg-red-100 hover:bg-red-200 border-red-300 text-red-700"
+              onClick={() => {
+                setDeleteDialogOpen(true);
+                setSelectedShipment(selectedShipment);
+              }}>
+              <Delete className="h-4 w-4" />
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Update shipment Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle></DialogTitle>
+          </DialogHeader>
+
+          {selectedShipment2 && <ShipmentEditPage shipmentId={selectedShipment2.id} />}
         </DialogContent>
       </Dialog>
 
@@ -474,7 +444,7 @@ export function AdminShipmentsTable() {
       <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Update Shipment Status</DialogTitle>
+            <DialogTitle>Update Shipment Event Status</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -486,9 +456,7 @@ export function AdminShipmentsTable() {
                 <SelectContent>
                   <SelectItem value="created">Created</SelectItem>
                   <SelectItem value="in_transit">In Transit</SelectItem>
-                  <SelectItem value="out_for_delivery">
-                    Out for Delivery
-                  </SelectItem>
+                  <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
                   <SelectItem value="delivered">Delivered</SelectItem>
                   <SelectItem value="exception">Exception</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -518,8 +486,7 @@ export function AdminShipmentsTable() {
                     {paymentOptions.map((option) => (
                       <label
                         key={option.type}
-                        className="flex items-center flex-wrap space-y-2 space-x-2 border rounded-md px-2 py-1 cursor-pointer hover:bg-gray-50"
-                      >
+                        className="flex items-center flex-wrap space-y-2 space-x-2 border rounded-md px-2 py-1 cursor-pointer hover:bg-gray-50">
                         <input
                           type="checkbox"
                           value={option.type}
@@ -563,16 +530,12 @@ export function AdminShipmentsTable() {
               />
             </div>
             <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setUpdateDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setUpdateDialogOpen(false)}>
                 Cancel
               </Button>
               <Button
                 onClick={handleUpdateStatus}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
+                className="bg-red-600 hover:bg-red-700 text-white">
                 Update Status
               </Button>
             </div>
@@ -584,25 +547,21 @@ export function AdminShipmentsTable() {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Shipment</DialogTitle>
+            <DialogTitle>Delete Shipment & Events</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <DialogDescription>
-              Are you sure you want to delete this shipment? This action cannot
-              be undone.
+              Are you sure you want to delete this shipment and it&apos;s tracking events? This
+              action cannot be undone.
             </DialogDescription>
 
             <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setDeleteDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
                 Cancel
               </Button>
               <Button
                 onClick={handleDeleteShipment}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
+                className="bg-red-600 hover:bg-red-700 text-white">
                 Delete Shipment
               </Button>
             </div>

@@ -1,21 +1,15 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
-import { AlertTriangle, ArrowRight, Package } from "lucide-react";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {createClient} from "@/lib/supabase/server";
+import {AlertTriangle, ArrowRight, Package} from "lucide-react";
 import Link from "next/link";
 
 export async function RecentActivity() {
   const supabase = await createClient();
 
   // Get recent shipments with user info
-  const { data: recentShipments } = await supabase
+  const {data: recentShipments} = await supabase
     .from("shipments")
     .select(
       `
@@ -26,22 +20,22 @@ export async function RecentActivity() {
       )
     `
     )
-    .order("created_at", { ascending: false })
+    .order("created_at", {ascending: false})
     .limit(10);
 
   // Get recent tracking events
-  const { data: recentEvents } = await supabase
+  const {data: recentEvents} = await supabase
     .from("tracking_events")
     .select(
       `
-      *,
+       *,
       shipments:shipment_id (
         tracking_number,
         recipient_name
       )
     `
     )
-    .order("created_at", { ascending: false })
+    .order("created_at", {ascending: false})
     .limit(5);
 
   const getStatusColor = (status: string) => {
@@ -75,9 +69,7 @@ export async function RecentActivity() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Recent Shipments</CardTitle>
-              <CardDescription>
-                Latest shipment activity across all users
-              </CardDescription>
+              <CardDescription>Latest shipment activity across all users</CardDescription>
             </div>
             <Button asChild variant="outline">
               <Link href="/admin/shipments">
@@ -92,8 +84,7 @@ export async function RecentActivity() {
               {recentShipments.slice(0, 3).map((shipment: any) => (
                 <div
                   key={shipment.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
+                  className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center space-x-4">
                     <div className="bg-blue-100 p-2 rounded-lg">
                       <Package className="h-4 w-4 text-blue-600" />
@@ -101,8 +92,7 @@ export async function RecentActivity() {
                     <div>
                       <p className="font-medium">{shipment.tracking_number}</p>
                       <p className="text-sm text-gray-600">
-                        {shipment.profiles?.full_name || "Unknown User"} →{" "}
-                        {shipment.recipient_name}
+                        {shipment.profiles?.full_name || "Unknown User"} → {shipment.recipient_name}
                       </p>
                       <p className="text-xs text-gray-500">
                         {new Date(shipment.created_at).toLocaleString()}
@@ -113,9 +103,7 @@ export async function RecentActivity() {
                     <Badge className={getStatusColor(shipment.status)}>
                       {formatStatus(shipment.status)}
                     </Badge>
-                    <p className="text-sm font-medium mt-1">
-                      ${shipment.total_cost.toFixed(2)}
-                    </p>
+                    <p className="text-sm font-medium mt-1">${shipment.total_cost.toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -132,9 +120,7 @@ export async function RecentActivity() {
       <Card>
         <CardHeader>
           <CardTitle>Recent Tracking Events</CardTitle>
-          <CardDescription>
-            Latest tracking updates across all shipments
-          </CardDescription>
+          <CardDescription>Latest tracking updates across all shipments</CardDescription>
         </CardHeader>
         <CardContent>
           {recentEvents && recentEvents.length > 0 ? (
@@ -159,18 +145,11 @@ export async function RecentActivity() {
                         {new Date(event.created_at).toLocaleString()}
                       </p>
                     </div>
-                    <p className="text-sm text-gray-600">
-                      {event.event_description}
-                    </p>
+                    <p className="text-sm text-gray-600">{event.event_description}</p>
                     <p className="text-xs text-gray-500">
-                      {event.shipments?.tracking_number} -{" "}
-                      {event.shipments?.recipient_name}
+                      {event.shipments?.tracking_number} - {event.shipments?.recipient_name}
                     </p>
-                    {event.location && (
-                      <p className="text-xs text-gray-500">
-                        📍 {event.location}
-                      </p>
-                    )}
+                    {event.location && <p className="text-xs text-gray-500">📍 {event.location}</p>}
                   </div>
                 </div>
               ))}

@@ -1,9 +1,9 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,25 +11,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createClient } from "@/lib/supabase/client";
-import type { Shipment } from "@/lib/types/database";
-import { Eye, Package, Search } from "lucide-react";
+import {createClient} from "@/lib/supabase/client";
+import type {Shipment} from "@/lib/types/database";
+import {Eye, Package, Search} from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {useRouter} from "next/navigation";
+import {useEffect, useState} from "react";
 
 interface ShipmentsTableProps {
   userId: string;
 }
 
-export function ShipmentsTable({ userId }: ShipmentsTableProps) {
+export function ShipmentsTable({userId}: ShipmentsTableProps) {
+  const router = useRouter();
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [filteredShipments, setFilteredShipments] = useState<Shipment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-
-  console.log("userId=====>", userId);
-  console.log("shipments=====>", shipments);
 
   useEffect(() => {
     fetchShipments();
@@ -42,11 +41,11 @@ export function ShipmentsTable({ userId }: ShipmentsTableProps) {
   const fetchShipments = async () => {
     try {
       const supabase = createClient();
-      const { data, error } = await supabase
+      const {data, error} = await supabase
         .from("shipments")
         .select("*")
         .eq("user_id", userId)
-        .order("created_at", { ascending: false });
+        .order("created_at", {ascending: false});
 
       if (error) throw error;
       setShipments(data || []);
@@ -63,22 +62,14 @@ export function ShipmentsTable({ userId }: ShipmentsTableProps) {
     if (searchTerm) {
       filtered = filtered.filter(
         (shipment) =>
-          shipment.tracking_number
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          shipment.recipient_name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          shipment.recipient_city
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
+          shipment.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          shipment.recipient_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          shipment.recipient_city.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (statusFilter !== "all") {
-      filtered = filtered.filter(
-        (shipment) => shipment.status === statusFilter
-      );
+      filtered = filtered.filter((shipment) => shipment.status === statusFilter);
     }
 
     setFilteredShipments(filtered);
@@ -150,14 +141,14 @@ export function ShipmentsTable({ userId }: ShipmentsTableProps) {
           </Select>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-y-auto">
         {filteredShipments.length > 0 ? (
           <div className="space-y-4">
             {filteredShipments.map((shipment) => (
               <div
+                onClick={() => router.push(`/dashboard/shipments/${shipment.id}`)}
                 key={shipment.id}
-                className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-              >
+                className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="bg-blue-100 p-2 rounded-lg">
@@ -166,12 +157,11 @@ export function ShipmentsTable({ userId }: ShipmentsTableProps) {
                     <div>
                       <p className="font-medium">{shipment.tracking_number}</p>
                       <p className="text-sm text-gray-600">
-                        {shipment.sender_city}, {shipment.sender_state} →{" "}
-                        {shipment.recipient_city}, {shipment.recipient_state}
+                        {shipment.sender_city}, {shipment.sender_state} → {shipment.recipient_city},{" "}
+                        {shipment.recipient_state}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Created:{" "}
-                        {new Date(shipment.created_at).toLocaleDateString()}
+                        Created: {new Date(shipment.created_at).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -180,14 +170,10 @@ export function ShipmentsTable({ userId }: ShipmentsTableProps) {
                       <Badge className={getStatusColor(shipment.status)}>
                         {formatStatus(shipment.status)}
                       </Badge>
-                      <p className="text-sm font-medium mt-1">
-                        ${shipment.total_cost.toFixed(2)}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {formatStatus(shipment.service_type)}
-                      </p>
+                      <p className="text-sm font-medium mt-1">${shipment.total_cost.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500">{formatStatus(shipment.service_type)}</p>
                     </div>
-                    <Button asChild variant="outline" size="sm">
+                    <Button className="hidden md:block" asChild variant="outline" size="sm">
                       <Link href={`/dashboard/shipments/${shipment.id}`}>
                         <Eye className="h-4 w-4 mr-1" />
                         View
@@ -209,16 +195,12 @@ export function ShipmentsTable({ userId }: ShipmentsTableProps) {
                   setSearchTerm("");
                   setStatusFilter("all");
                 }}
-                className="mt-4"
-              >
+                className="mt-4">
                 Clear Filters
               </Button>
             ) : (
-              <Button
-                asChild
-                className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Link href="/dashboard/create">Create Your First Shipment</Link>
+              <Button asChild className="mt-4 bg-blue-600 hover:bg-blue-700 text-white">
+                <Link href="">Create Your First Shipment</Link>
               </Button>
             )}
           </div>

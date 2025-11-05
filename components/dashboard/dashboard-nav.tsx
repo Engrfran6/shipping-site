@@ -1,23 +1,18 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import {
-  BarChart3,
-  Home,
-  Package,
-  Package2Icon,
-  Truck,
-  User,
-} from "lucide-react";
+import {cn} from "@/lib/utils";
+import {BarChart3, Home, Package, Package2Icon, Truck, User} from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import {usePathname} from "next/navigation";
+import {LogoutButton} from "../auth/logout-button";
+import {MobileNavDrawer} from "../mobile-nav-drawer";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Shipments", href: "/dashboard/shipments", icon: Package },
-  { name: "Track Shipment", href: "/dashboard/track", icon: Package2Icon },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-  { name: "Profile", href: "/dashboard/profile", icon: User },
+  {name: "Dashboard", href: "/dashboard", icon: Home},
+  {name: "Shipments", href: "/dashboard/shipments", icon: Package},
+  {name: "Track Shipment", href: "/dashboard/track", icon: Package2Icon},
+  {name: "Analytics", href: "/dashboard/analytics", icon: BarChart3},
+  {name: "Profile", href: "/dashboard/profile", icon: User},
 ];
 
 export function DashboardNav() {
@@ -46,14 +41,17 @@ export function DashboardNav() {
                       pathname === item.href
                         ? "bg-blue-100 text-blue-700"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                    )}
-                  >
+                    )}>
                     <Icon className="h-4 w-4" />
                     <span>{item.name}</span>
                   </Link>
                 );
               })}
             </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <LogoutButton />
+            <MobileNavDrawer items={navigation} />
           </div>
         </div>
       </div>
