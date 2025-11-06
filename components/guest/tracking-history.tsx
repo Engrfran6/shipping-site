@@ -377,13 +377,13 @@ const TrackingHistory = ({shipment, trackingEvents, paymentOptions = []}: Tracke
                           <p className="text-xs text-gray-500">
                             Or email your proof to{" "}
                             <a
-                              href={`mailto:payments@swiftship.com?subject=${encodeURIComponent(
+                              href={`mailto:support@swiftshipverse.com?subject=${encodeURIComponent(
                                 `Proof of Payment for ${shipment.recipient_name} - ${shipment.recipient_city}`
                               )}&body=${encodeURIComponent(
                                 `Hello,\n\nPlease find attached the proof of payment for the shipment to ${shipment.recipient_name}, ${shipment.recipient_city}.\n\nTracking/Reference: \n\nThank you.`
                               )}`}
                               className="font-semibold text-indigo-600 underline">
-                              payments@swiftship.com
+                              support@swiftshipverse.com
                             </a>
                           </p>
 
@@ -412,7 +412,7 @@ const TrackingHistory = ({shipment, trackingEvents, paymentOptions = []}: Tracke
                                 `Hello,\n\nPlease find attached the proof of payment for the shipment to ${shipment.recipient_name}, ${shipment.recipient_city}.\n\nTracking/Reference: \n\nThank you.`
                               )}`}
                               className="font-semibold text-indigo-600 underline">
-                              payments@swiftship.com
+                              support@swiftshipverse.com
                             </a>
                           </p>
                         </AlertDialogDescription>

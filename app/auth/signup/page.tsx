@@ -2,28 +2,15 @@
 
 import type React from "react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { createClient } from "@/lib/supabase/client";
-import { Loader } from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {createClient} from "@/lib/supabase/client";
+import {Loader} from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import {useRouter} from "next/navigation";
+import {useState} from "react";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -52,7 +39,7 @@ export default function SignupPage() {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const {error} = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -77,7 +64,7 @@ export default function SignupPage() {
   };
 
   const updateFormData = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({...prev, [field]: value}));
   };
 
   return (
@@ -86,9 +73,7 @@ export default function SignupPage() {
         <div className="flex flex-col gap-6">
           <Card className="shadow-lg">
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold text-gray-900">
-                Create Account
-              </CardTitle>
+              <CardTitle className="text-2xl font-bold text-gray-900">Create Account</CardTitle>
               <CardDescription className="text-gray-600">
                 Join our shipping platform
               </CardDescription>
@@ -120,9 +105,7 @@ export default function SignupPage() {
                       placeholder="John Doe"
                       required
                       value={formData.fullName}
-                      onChange={(e) =>
-                        updateFormData("fullName", e.target.value)
-                      }
+                      onChange={(e) => updateFormData("fullName", e.target.value)}
                       className="border-gray-300 focus:border-blue-500"
                     />
                   </div>
@@ -148,13 +131,11 @@ export default function SignupPage() {
                       type="text"
                       placeholder="Your Company Inc."
                       value={formData.companyName}
-                      onChange={(e) =>
-                        updateFormData("companyName", e.target.value)
-                      }
+                      onChange={(e) => updateFormData("companyName", e.target.value)}
                       className="border-gray-300 focus:border-blue-500"
                     />
                   </div>
-                  <div className="grid gap-2">
+                  {/* <div className="grid gap-2">
                     <Label htmlFor="userType" className="text-gray-700">
                       Account Type
                     </Label>
@@ -172,7 +153,7 @@ export default function SignupPage() {
                         <SelectItem value="admin">Administrator</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
                   <div className="grid gap-2">
                     <Label htmlFor="password" className="text-gray-700">
                       Password
@@ -182,9 +163,7 @@ export default function SignupPage() {
                       type="password"
                       required
                       value={formData.password}
-                      onChange={(e) =>
-                        updateFormData("password", e.target.value)
-                      }
+                      onChange={(e) => updateFormData("password", e.target.value)}
                       className="border-gray-300 focus:border-blue-500"
                     />
                   </div>
@@ -197,26 +176,18 @@ export default function SignupPage() {
                       type="password"
                       required
                       value={formData.confirmPassword}
-                      onChange={(e) =>
-                        updateFormData("confirmPassword", e.target.value)
-                      }
+                      onChange={(e) => updateFormData("confirmPassword", e.target.value)}
                       className="border-gray-300 focus:border-blue-500"
                     />
                   </div>
-                  {error && (
-                    <p className="text-sm text-red-600 bg-red-50 p-2 rounded">
-                      {error}
-                    </p>
-                  )}
+                  {error && <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</p>}
                   <Button
                     type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    disabled={isLoading}
-                  >
+                    disabled={isLoading}>
                     {isLoading ? (
                       <>
-                        <Loader className="animate-spin" /> Creating
-                        account......
+                        <Loader className="animate-spin" /> Creating account......
                       </>
                     ) : (
                       "Create Account"
@@ -227,8 +198,7 @@ export default function SignupPage() {
                   Already have an account?{" "}
                   <Link
                     href="/auth/login"
-                    className="text-blue-600 hover:text-blue-700 underline underline-offset-4"
-                  >
+                    className="text-blue-600 hover:text-blue-700 underline underline-offset-4">
                     Sign in
                   </Link>
                 </div>
