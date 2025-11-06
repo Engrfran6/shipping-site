@@ -9,26 +9,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import type { Shipment, TrackingEvent } from "@/lib/types/database";
-import { cn } from "@/lib/utils";
-import {
-  AlertTriangle,
-  ArrowRight,
-  CheckCircle,
-  CheckCircleIcon,
-  CreditCard,
-  X,
-} from "lucide-react";
-import React, { useState } from "react";
-import { Button } from "../ui/button";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import type {Shipment, TrackingEvent} from "@/lib/types/database";
+import {cn} from "@/lib/utils";
+import {AlertTriangle, ArrowRight, CheckCircle, CheckCircleIcon, CreditCard, X} from "lucide-react";
+import React, {useState} from "react";
+import {Button} from "../ui/button";
+import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 
 export interface PaymentOption {
   type: string;
@@ -45,19 +32,13 @@ interface TrackerHistoryProps {
   paymentOptions?: PaymentOption[]; // 🔹 comes from backend
 }
 
-const TrackingHistory = ({
-  shipment,
-  trackingEvents,
-  paymentOptions = [],
-}: TrackerHistoryProps) => {
+const TrackingHistory = ({shipment, trackingEvents, paymentOptions = []}: TrackerHistoryProps) => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedException, setSelectedException] =
-    useState<TrackingEvent | null>(null);
+  const [selectedException, setSelectedException] = useState<TrackingEvent | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [hasPaid, setHasPaid] = useState(false);
-  const [selectedPaymentOption, setSelectedPaymentOption] =
-    useState<string>("");
+  const [selectedPaymentOption, setSelectedPaymentOption] = useState<string>("");
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
@@ -100,9 +81,7 @@ const TrackingHistory = ({
     // Simulate upload (replace with Supabase storage or S3 later)
     setTimeout(() => {
       setIsUploading(false);
-      setAlertMessage(
-        "Payment proof uploaded successfully. We'll verify shortly!"
-      );
+      setAlertMessage("Payment proof uploaded successfully. We'll verify shortly!");
       setShowAlert(true);
       closeModal();
     }, 2000);
@@ -113,51 +92,38 @@ const TrackingHistory = ({
       {trackingEvents.length > 0 && (
         <>
           <Card className="bg-white/80 backdrop-blur-md shadow-md border border-gray-100">
-            <CardHeader className="flex items-center justify-between">
+            <CardHeader className="flex px-4 items-center justify-between">
               <div className="space-y-2">
-                <CardTitle className="text-lg text-gray-900">
-                  Tracking Progress
-                </CardTitle>
-                <CardDescription>
-                  Real-time updates on your package journey
-                </CardDescription>
+                <CardTitle className="text-lg text-gray-900">Tracking Progress</CardTitle>
+                <CardDescription>Real-time updates on your package journey</CardDescription>
               </div>
             </CardHeader>
 
-            <CardContent>
-              <div className="space-y-8">
+            <CardContent className="px-4">
+              <div className="space-y-4">
                 {/* Progress Bar */}
                 <div className="relative w-4/5 mx-auto mt-4">
                   <div className="relative h-1 bg-gray-200 rounded-full">
                     <div
                       className={cn(
                         "absolute h-1 rounded-full transition-all duration-700 ease-in-out",
-                        currentStatus === "delivered"
-                          ? "bg-green-600"
-                          : "bg-indigo-600"
+                        currentStatus === "delivered" ? "bg-green-600" : "bg-indigo-600"
                       )}
                       style={{
-                        width: `${
-                          (Math.min(trackingEvents.length, 5) - 1) * 25
-                        }%`,
-                      }}
-                    ></div>
+                        width: `${(Math.min(trackingEvents.length, 5) - 1) * 25}%`,
+                      }}></div>
                   </div>
 
                   {/* Progress Dots */}
                   <div
                     className="absolute top-0 left-0 w-full flex justify-between"
-                    style={{ transform: "translateY(-6px)" }}
-                  >
+                    style={{transform: "translateY(-6px)"}}>
                     {[...Array(5)].map((_, index) => {
                       const isPassed = index < trackingEvents.length - 1;
                       const isCurrent = index === trackingEvents.length - 1;
 
                       return (
-                        <div
-                          key={index}
-                          className="relative flex items-center justify-center"
-                        >
+                        <div key={index} className="relative flex items-center justify-center">
                           {isCurrent ? (
                             <div className="relative flex items-center justify-center">
                               <span
@@ -166,16 +132,14 @@ const TrackingHistory = ({
                                   currentStatus === "delivered"
                                     ? "bg-green-200 h-6 w-6"
                                     : "bg-indigo-300 h-6 w-6"
-                                )}
-                              ></span>
+                                )}></span>
                               <div
                                 className={cn(
                                   "relative flex items-center justify-center rounded-full border-2 h-4 w-4",
                                   currentStatus === "delivered"
                                     ? "bg-green-600 border-green-600"
                                     : "bg-indigo-600 border-indigo-600"
-                                )}
-                              >
+                                )}>
                                 {currentStatus === "delivered" ? (
                                   <CheckCircle className="text-white h-3 w-3" />
                                 ) : (
@@ -192,8 +156,7 @@ const TrackingHistory = ({
                                   : isPassed && currentStatus === "delivered"
                                   ? "bg-green-600 border-green-600"
                                   : "bg-gray-300 border-gray-300"
-                              )}
-                            ></div>
+                              )}></div>
                           )}
                         </div>
                       );
@@ -202,7 +165,7 @@ const TrackingHistory = ({
 
                   {/* Current Status Text */}
                   {shipment && (
-                    <div className="flex flex-col items-center mt-10 space-y-1">
+                    <div className="flex flex-col items-center mt-6 space-y-1">
                       <p
                         className={cn(
                           "text-2xl capitalize",
@@ -211,15 +174,12 @@ const TrackingHistory = ({
                             : currentStatus === "exception"
                             ? "text-red-800"
                             : "text-indigo-700"
-                        )}
-                      >
+                        )}>
                         {currentStatus === "exception" ? (
                           <div className="text-sm">
                             An {formatStatus(currentStatus)} has occured: {""}
-                            <span className="underline cursor-pointer italic">
-                              Shipment
-                            </span>{" "}
-                            On Hold
+                            <span className="underline cursor-pointer italic">Shipment</span> On
+                            Hold
                           </div>
                         ) : (
                           formatStatus(currentStatus)
@@ -235,13 +195,14 @@ const TrackingHistory = ({
                 </div>
 
                 {/* Travel History */}
-                <div className="mt-10">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900">
-                    Travel History
-                  </h3>
-                  <div className="border rounded-lg overflow-hidden shadow-sm">
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900">Travel History</h3>
+                  <div className="overflow-hidden">
                     <div className="grid grid-cols-12 gap-4 bg-gray-50 px-4 py-3 border-b font-semibold text-sm text-gray-700">
-                      <div className="col-span-2">Date/Time</div>
+                      <div className="flex flex-col md:flex-row col-span-2">
+                        <span>Date/</span>
+                        <span>Time</span>
+                      </div>
                       <div className="col-span-7">Activity</div>
                       <div className="col-span-3 text-right">Location</div>
                     </div>
@@ -266,9 +227,7 @@ const TrackingHistory = ({
                               {dateStr}
                             </div>
                             <div className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-gray-50 transition-colors">
-                              <div className="col-span-2 text-sm text-gray-600">
-                                {time}
-                              </div>
+                              <div className="col-span-2 text-sm text-gray-600">{time}</div>
                               <div className="col-span-7">
                                 <div className="flex items-center text-sm font-medium text-gray-900">
                                   {formatStatus(event.event_type)}
@@ -281,11 +240,8 @@ const TrackingHistory = ({
                                     <div className="inline-flex items-center ml-2 text-red-600">
                                       <AlertTriangle className="h-4 w-4" />
                                       <button
-                                        onClick={() =>
-                                          handleResolveClick(event)
-                                        }
-                                        className="hover:underline ml-2"
-                                      >
+                                        onClick={() => handleResolveClick(event)}
+                                        className="hover:underline ml-2">
                                         Resolve
                                       </button>
                                     </div>
@@ -317,8 +273,7 @@ const TrackingHistory = ({
               <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative animate-fade-in">
                 <button
                   onClick={closeModal}
-                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-                >
+                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
                   <X className="h-5 w-5" />
                 </button>
 
@@ -339,9 +294,9 @@ const TrackingHistory = ({
                     options below and upload your proof.
                   </p> */}
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    <strong>How to Resolve:</strong> Please complete the pending
-                    payment to continue your shipment process. Once payment is
-                    received, the delivery will resume within 24–48 hours.
+                    <strong>How to Resolve:</strong> Please complete the pending payment to continue
+                    your shipment process. Once payment is received, the delivery will resume within
+                    24–48 hours.
                   </p>
 
                   {/* Dynamic Payment Options */}
@@ -350,21 +305,16 @@ const TrackingHistory = ({
                       <RadioGroup
                         value={selectedPaymentOption}
                         onValueChange={(val) => setSelectedPaymentOption(val)} // handle selection
-                        className="space-y-3 my-3 mx-1"
-                      >
+                        className="space-y-3 my-3 mx-1">
                         {paymentOptions.map((option, i) => (
                           <div
                             key={i}
                             className={cn(
                               "flex items-start justify-between border rounded-md p-4 bg-gray-50 cursor-pointer",
-                              selectedPaymentOption === option.type &&
-                                "ring-2 ring-indigo-500"
-                            )}
-                          >
+                              selectedPaymentOption === option.type && "ring-2 ring-indigo-500"
+                            )}>
                             <div>
-                              <h3 className="font-semibold text-gray-800 mb-1">
-                                {option.label}
-                              </h3>
+                              <h3 className="font-semibold text-gray-800 mb-1">{option.label}</h3>
                               {option.account && (
                                 <p className="text-sm text-gray-700">
                                   <strong>Account:</strong> {option.account}
@@ -381,9 +331,7 @@ const TrackingHistory = ({
                                 </p>
                               )}
                               {option.note && (
-                                <p className="text-xs text-gray-500 italic mt-1">
-                                  {option.note}
-                                </p>
+                                <p className="text-xs text-gray-500 italic mt-1">{option.note}</p>
                               )}
                             </div>
 
@@ -397,8 +345,7 @@ const TrackingHistory = ({
                       </RadioGroup>
                     ) : (
                       <p className="text-gray-500 text-sm italic">
-                        No payment options currently available. Please contact
-                        support.
+                        No payment options currently available. Please contact support.
                       </p>
                     )}
                   </div>
@@ -410,8 +357,7 @@ const TrackingHistory = ({
                         <Button
                           onClick={() => setHasPaid(true)}
                           disabled={!selectedPaymentOption}
-                          className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center justify-center gap-2"
-                        >
+                          className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center justify-center gap-2">
                           <CreditCard className="h-4 w-4" />
                           I’ve Made the Payment
                         </Button>
@@ -436,8 +382,7 @@ const TrackingHistory = ({
                               )}&body=${encodeURIComponent(
                                 `Hello,\n\nPlease find attached the proof of payment for the shipment to ${shipment.recipient_name}, ${shipment.recipient_city}.\n\nTracking/Reference: \n\nThank you.`
                               )}`}
-                              className="font-semibold text-indigo-600 underline"
-                            >
+                              className="font-semibold text-indigo-600 underline">
                               payments@swiftship.com
                             </a>
                           </p>
@@ -445,11 +390,8 @@ const TrackingHistory = ({
                           <Button
                             onClick={handleConfirmPayment}
                             disabled={isUploading}
-                            className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md"
-                          >
-                            {isUploading
-                              ? "Uploading..."
-                              : "Submit Proof of Payment"}
+                            className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md">
+                            {isUploading ? "Uploading..." : "Submit Proof of Payment"}
                           </Button>
                         </div>
                       )}
@@ -458,9 +400,7 @@ const TrackingHistory = ({
                   <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
                     <AlertDialogContent className="max-2/3 bg-red-50 border border-red-200">
                       <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {/* Notification */}
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>{/* Notification */}</AlertDialogTitle>
                         <AlertDialogDescription>
                           {alertMessage}
                           <p className="text-xs text-gray-500 mt-2">
@@ -471,8 +411,7 @@ const TrackingHistory = ({
                               )}&body=${encodeURIComponent(
                                 `Hello,\n\nPlease find attached the proof of payment for the shipment to ${shipment.recipient_name}, ${shipment.recipient_city}.\n\nTracking/Reference: \n\nThank you.`
                               )}`}
-                              className="font-semibold text-indigo-600 underline"
-                            >
+                              className="font-semibold text-indigo-600 underline">
                               payments@swiftship.com
                             </a>
                           </p>
@@ -481,8 +420,7 @@ const TrackingHistory = ({
                       <AlertDialogFooter>
                         <AlertDialogAction
                           onClick={() => setShowAlert(false)}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
+                          className="bg-red-600 hover:bg-red-700 text-white">
                           OK
                         </AlertDialogAction>
                       </AlertDialogFooter>

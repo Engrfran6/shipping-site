@@ -38,8 +38,14 @@ const Navbar = () => {
             <Link href="/auth/signup">Get Started</Link>
           </Button>
         </nav>
-
-        <MobileNavDrawer items={navigation} />
+        <div className="md:hidden flex items-center">
+          <Link
+            href="/track"
+            className="mr-1 border border-blue-700 px-4 rounded-2xl text-gray-600 hover:text-blue-600 transition-colors">
+            Track
+          </Link>
+          <MobileNavDrawer items={navigation} />
+        </div>
       </div>
     </header>
   );

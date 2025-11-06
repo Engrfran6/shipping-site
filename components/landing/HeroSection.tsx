@@ -1,14 +1,14 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {ArrowRight} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Slider from "react-slick";
 
 const backgroundImages = [
-  "/hero-shipping-img.webp",
+  "/hero-shipping-img.png",
   "/shipping-img2.webp",
   "/shipping-img3.webp",
   "/shipping-img4.webp",
@@ -59,16 +59,11 @@ export default function HeroSection() {
           Ship Smarter,<span className="text-blue-400"> Deliver Faster</span>
         </h1>
         <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto text-pretty">
-          Professional shipping solutions for businesses of all sizes. Track
-          packages in real-time, get instant quotes, and manage your logistics
-          with ease.
+          Professional shipping solutions for businesses of all sizes. Track packages in real-time,
+          get instant quotes, and manage your logistics with ease.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            size="lg"
-            asChild
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
+          <Button size="lg" asChild className="bg-blue-600 hover:bg-blue-700 text-white">
             <Link href="/quote">
               Get Instant Quote <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
@@ -77,8 +72,7 @@ export default function HeroSection() {
             size="lg"
             variant="outline"
             asChild
-            className="border-gray-300 text-white hover:bg-white/10 bg-transparent"
-          >
+            className="border-gray-300 text-white hover:bg-white/10 bg-transparent">
             <Link href="/track">Track Shipment</Link>
           </Button>
         </div>

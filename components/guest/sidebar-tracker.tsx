@@ -1,19 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Shipment } from "@/lib/types/database";
-import { AlertCircle, CheckCircle, Package, Search } from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Shipment} from "@/lib/types/database";
+import {AlertCircle, CheckCircle, Package, Search} from "lucide-react";
 import React from "react";
-import { Badge } from "../ui/badge";
+import {Badge} from "../ui/badge";
 
 interface SidebarTrackerProps {
   shipment: Shipment | null;
@@ -66,13 +60,12 @@ export default function SidebarTracker({
       .join(" ");
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <Card className="bg-white/70 backdrop-blur-md shadow-md border border-gray-100">
-        <CardHeader>
-          <CardTitle className="text-2xl text-gray-800">
-            Track a Shipment
-          </CardTitle>
-        </CardHeader>
+        <CardTitle className="hidden md:block text-2xl md:mx-5 text-gray-800">
+          Track a Shipment
+        </CardTitle>
+
         <CardContent>
           <form onSubmit={handleTrack} className="space-y-5">
             <div>
@@ -97,8 +90,7 @@ export default function SidebarTracker({
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
-            >
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
               {isLoading ? (
                 "Tracking..."
               ) : (
@@ -116,9 +108,7 @@ export default function SidebarTracker({
         <Card className="shadow-sm border border-gray-100">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg text-gray-900">
-                Package Details
-              </CardTitle>
+              <CardTitle className="text-lg text-gray-900">Package Details</CardTitle>
               <Badge className={getStatusColor(shipment.status)}>
                 {getStatusIcon(shipment.status)}
                 <span className="ml-1">{formatStatus(shipment.status)}</span>
@@ -129,7 +119,7 @@ export default function SidebarTracker({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">From</h4>
                 <p className="text-sm text-gray-600 leading-relaxed">
@@ -137,8 +127,7 @@ export default function SidebarTracker({
                   <br />
                   {shipment.sender_address}
                   <br />
-                  {shipment.sender_city}, {shipment.sender_state}{" "}
-                  {shipment.sender_postal_code}
+                  {shipment.sender_city}, {shipment.sender_state} {shipment.sender_postal_code}
                 </p>
               </div>
               <div>
@@ -154,32 +143,22 @@ export default function SidebarTracker({
               </div>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
               <div className="text-center">
-                <div className="text-xs text-gray-500 uppercase tracking-wide">
-                  Service
-                </div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Service</div>
                 <div className="font-semibold text-gray-800">
                   {formatStatus(shipment.service_type)}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-xs text-gray-500 uppercase tracking-wide">
-                  Weight
-                </div>
-                <div className="font-semibold text-gray-800">
-                  {shipment.weight_kg} kg
-                </div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Weight</div>
+                <div className="font-semibold text-gray-800">{shipment.weight_kg} kg</div>
               </div>
               <div className="text-center">
-                <div className="text-xs text-gray-500 uppercase tracking-wide">
-                  Est. Delivery
-                </div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Est. Delivery</div>
                 <div className="font-semibold text-gray-800">
                   {shipment.estimated_delivery_date
-                    ? new Date(
-                        shipment.estimated_delivery_date
-                      ).toLocaleDateString()
+                    ? new Date(shipment.estimated_delivery_date).toLocaleDateString()
                     : "TBD"}
                 </div>
               </div>

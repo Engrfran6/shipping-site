@@ -7,12 +7,12 @@ const Footer = () => {
       <div className="container mx-auto">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center space-x-2 mb-4">
+            <Link href="/" className="flex items-center space-x-2  mb-4">
               <div className="bg-blue-600 p-2 rounded-lg">
                 <Truck className="h-5 w-5 text-white" />
               </div>
               <span className="text-lg font-bold">SwiftShip</span>
-            </div>
+            </Link>
             <p className="text-gray-400 text-sm">
               Professional shipping solutions for businesses worldwide.
             </p>
