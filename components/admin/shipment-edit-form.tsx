@@ -158,7 +158,7 @@ export function ShipmentEditForm({shipment: initialShipment}: {shipment: Shipmen
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-h-[80vh]">
+    <form onSubmit={handleSubmit} className="max-h-[70vh]">
       <div className="space-y-6 mb-3">
         {/* Error Alert */}
         {error && (
@@ -172,12 +172,12 @@ export function ShipmentEditForm({shipment: initialShipment}: {shipment: Shipmen
         {success && (
           <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
             <CheckCircle className="h-5 w-5 text-green-600" />
-            <p className="text-green-800">Shipment updated successfully. Redirecting...</p>
+            <p className="text-green-800">Shipment updated successfully.</p>
           </div>
         )}
       </div>
 
-      <div className="overflow-y-auto max-h-[70vh] space-y-6">
+      <div className="overflow-y-auto max-h-[65vh] space-y-6">
         {/* Sender Information */}
         <Card>
           <CardHeader>
@@ -203,6 +203,7 @@ export function ShipmentEditForm({shipment: initialShipment}: {shipment: Shipmen
                   name="sender_email"
                   type="email"
                   value={shipment.sender_email || ""}
+                  placeholder="optional"
                   onChange={handleInputChange}
                 />
               </div>
@@ -221,8 +222,8 @@ export function ShipmentEditForm({shipment: initialShipment}: {shipment: Shipmen
                   id="sender_address"
                   name="sender_address"
                   value={shipment.sender_address}
+                  placeholder="optional"
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
@@ -231,8 +232,8 @@ export function ShipmentEditForm({shipment: initialShipment}: {shipment: Shipmen
                   id="sender_city"
                   name="sender_city"
                   value={shipment.sender_city}
+                  placeholder="optional"
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
@@ -245,16 +246,7 @@ export function ShipmentEditForm({shipment: initialShipment}: {shipment: Shipmen
                   required
                 />
               </div>
-              <div>
-                <Label htmlFor="sender_postal_code">Postal Code</Label>
-                <Input
-                  id="sender_postal_code"
-                  name="sender_postal_code"
-                  value={shipment.sender_postal_code}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+
               <div>
                 <Label htmlFor="sender_country">Country</Label>
                 <Input
@@ -263,6 +255,16 @@ export function ShipmentEditForm({shipment: initialShipment}: {shipment: Shipmen
                   value={shipment.sender_country}
                   onChange={handleInputChange}
                   required
+                />
+              </div>
+              <div>
+                <Label htmlFor="sender_postal_code">Postal Code</Label>
+                <Input
+                  id="sender_postal_code"
+                  name="sender_postal_code"
+                  value={shipment.sender_postal_code}
+                  placeholder="optional"
+                  onChange={handleInputChange}
                 />
               </div>
             </div>
@@ -390,7 +392,6 @@ export function ShipmentEditForm({shipment: initialShipment}: {shipment: Shipmen
                   id="weight_kg"
                   name="weight_kg"
                   type="number"
-                  step="0.01"
                   value={shipment.weight_kg}
                   onChange={handleNumberChange}
                   required
