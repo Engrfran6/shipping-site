@@ -87,6 +87,34 @@ const TrackingHistory = ({shipment, trackingEvents, paymentOptions = []}: Tracke
     }, 2000);
   };
 
+  const senderLocation = shipment?.sender_city || "?";
+  const recipientLocation = shipment?.recipient_city || "?";
+
+  const date = new Date(shipment.created_at);
+  const time = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const shipmentDate = date.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+
+  // Ensure we never pass undefined to the Date constructor by falling back to created_at or now
+  const ddate = new Date(shipment.estimated_delivery_date ?? shipment.created_at ?? Date.now());
+  const dtime = ddate.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const shipmentDeliveryDate = ddate.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+
   return (
     <div>
       {trackingEvents.length > 0 && (
@@ -102,96 +130,117 @@ const TrackingHistory = ({shipment, trackingEvents, paymentOptions = []}: Tracke
             <CardContent className="px-4">
               <div className="space-y-4">
                 {/* Progress Bar */}
-                <div className="relative w-4/5 mx-auto mt-4">
-                  <div className="relative h-1 bg-gray-200 rounded-full">
-                    <div
-                      className={cn(
-                        "absolute h-1 rounded-full transition-all duration-700 ease-in-out",
-                        currentStatus === "delivered" ? "bg-green-600" : "bg-indigo-600"
-                      )}
-                      style={{
-                        width: `${(Math.min(trackingEvents.length, 5) - 1) * 25}%`,
-                      }}></div>
+                <div className="flex items-center justify-center">
+                  <div className="w-1/4 rounded-md text-sm text-gray-700 mr-10">
+                    <div>
+                      <p className="text-gray-500">Ship date:</p>
+                      <span className="font-semibold text-sm">{shipmentDate}</span>
+                    </div>
+                    <div className="mt-2 w-full h-0.5 bg-gray-200 mb-2"></div>
+                    {senderLocation && <p>{senderLocation}</p>}
                   </div>
+                  <div className="relative w-1/2 mx-auto mt-4">
+                    <div className="relative h-1 bg-gray-200 rounded-full">
+                      <div
+                        className={cn(
+                          "absolute h-1 rounded-full transition-all duration-700 ease-in-out",
+                          currentStatus === "delivered" ? "bg-green-600" : "bg-indigo-600"
+                        )}
+                        style={{
+                          width: `${(Math.min(trackingEvents.length, 5) - 1) * 25}%`,
+                        }}></div>
+                    </div>
 
-                  {/* Progress Dots */}
-                  <div
-                    className="absolute top-0 left-0 w-full flex justify-between"
-                    style={{transform: "translateY(-6px)"}}>
-                    {[...Array(5)].map((_, index) => {
-                      const isPassed = index < trackingEvents.length - 1;
-                      const isCurrent = index === trackingEvents.length - 1;
+                    {/* Progress Dots */}
+                    <div
+                      className="absolute top-0 left-0 w-full flex justify-between"
+                      style={{transform: "translateY(-6px)"}}>
+                      {[...Array(5)].map((_, index) => {
+                        const isPassed = index < trackingEvents.length - 1;
+                        const isCurrent = index === trackingEvents.length - 1;
 
-                      return (
-                        <div key={index} className="relative flex items-center justify-center">
-                          {isCurrent ? (
-                            <div className="relative flex items-center justify-center">
-                              <span
-                                className={cn(
-                                  "absolute inline-flex rounded-full opacity-75 animate-ping",
-                                  currentStatus === "delivered"
-                                    ? "bg-green-200 h-6 w-6"
-                                    : "bg-indigo-300 h-6 w-6"
-                                )}></span>
+                        return (
+                          <div key={index} className="relative flex items-center justify-center">
+                            {isCurrent ? (
+                              <div className="relative flex items-center justify-center">
+                                <span
+                                  className={cn(
+                                    "absolute inline-flex rounded-full opacity-75 animate-ping",
+                                    currentStatus === "delivered"
+                                      ? "bg-green-200 h-6 w-6"
+                                      : "bg-indigo-300 h-6 w-6"
+                                  )}></span>
+                                <div
+                                  className={cn(
+                                    "relative flex items-center justify-center rounded-full border-2 h-4 w-4",
+                                    currentStatus === "delivered"
+                                      ? "bg-green-600 border-green-600"
+                                      : "bg-indigo-600 border-indigo-600"
+                                  )}>
+                                  {currentStatus === "delivered" ? (
+                                    <CheckCircle className="text-white h-3 w-3" />
+                                  ) : (
+                                    <ArrowRight className="text-white h-3 w-3" />
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
                               <div
                                 className={cn(
-                                  "relative flex items-center justify-center rounded-full border-2 h-4 w-4",
-                                  currentStatus === "delivered"
+                                  "flex items-center justify-center rounded-full border-2 transition-all duration-300 w-3 h-3",
+                                  isPassed && currentStatus !== "delivered"
+                                    ? "bg-indigo-600 border-indigo-600"
+                                    : isPassed && currentStatus === "delivered"
                                     ? "bg-green-600 border-green-600"
-                                    : "bg-indigo-600 border-indigo-600"
-                                )}>
-                                {currentStatus === "delivered" ? (
-                                  <CheckCircle className="text-white h-3 w-3" />
-                                ) : (
-                                  <ArrowRight className="text-white h-3 w-3" />
-                                )}
-                              </div>
+                                    : "bg-gray-300 border-gray-300"
+                                )}></div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Current Status Text */}
+                    {shipment && (
+                      <div className="flex flex-col items-center mt-6 space-y-1">
+                        <p
+                          className={cn(
+                            "text-2xl capitalize",
+                            currentStatus === "delivered"
+                              ? "text-green-700"
+                              : currentStatus === "exception"
+                              ? "text-red-800"
+                              : "text-indigo-700"
+                          )}>
+                          {currentStatus === "exception" ? (
+                            <div className="text-sm">
+                              An {formatStatus(currentStatus)} has occured: {""}
+                              <span className="underline cursor-pointer italic">Shipment</span> On
+                              Hold
                             </div>
                           ) : (
-                            <div
-                              className={cn(
-                                "flex items-center justify-center rounded-full border-2 transition-all duration-300 w-3 h-3",
-                                isPassed && currentStatus !== "delivered"
-                                  ? "bg-indigo-600 border-indigo-600"
-                                  : isPassed && currentStatus === "delivered"
-                                  ? "bg-green-600 border-green-600"
-                                  : "bg-gray-300 border-gray-300"
-                              )}></div>
+                            formatStatus(currentStatus)
                           )}
-                        </div>
-                      );
-                    })}
+                        </p>
+                        <p className="text-sm text-gray-600 italic">
+                          {currentStatus === "delivered"
+                            ? `${shipment.recipient_name}, ${shipment.recipient_city}`
+                            : currentLocation || "—"}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Current Status Text */}
-                  {shipment && (
-                    <div className="flex flex-col items-center mt-6 space-y-1">
-                      <p
-                        className={cn(
-                          "text-2xl capitalize",
-                          currentStatus === "delivered"
-                            ? "text-green-700"
-                            : currentStatus === "exception"
-                            ? "text-red-800"
-                            : "text-indigo-700"
-                        )}>
-                        {currentStatus === "exception" ? (
-                          <div className="text-sm">
-                            An {formatStatus(currentStatus)} has occured: {""}
-                            <span className="underline cursor-pointer italic">Shipment</span> On
-                            Hold
-                          </div>
-                        ) : (
-                          formatStatus(currentStatus)
-                        )}
-                      </p>
-                      <p className="text-sm text-gray-600 italic">
-                        {currentStatus === "delivered"
-                          ? `${shipment.recipient_name}, ${shipment.recipient_city}`
-                          : currentLocation || "—"}
-                      </p>
+                  <div className="w-1/4 rounded-md text-sm text-gray-700 ml-10">
+                    <div>
+                      <p className="text-gray-500">Schedule delivery:</p>
+                      <span className="font-semibold text-sm text-indigo-600">
+                        {!shipmentDeliveryDate ? shipmentDeliveryDate : "Pending"}
+                      </span>
                     </div>
-                  )}
+                    <div className="mt-2 w-full h-0.5 bg-gray-200 mb-2"></div>
+                    {recipientLocation && <p>{recipientLocation}</p>}
+                  </div>
                 </div>
 
                 {/* Travel History */}

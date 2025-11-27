@@ -7,12 +7,12 @@ create table if not exists public.shipments (
   -- Sender information
   sender_name text not null,
   sender_email text,
-  sender_phone text,
-  sender_address text not null,
-  sender_city text not null,
+  sender_phone text not null,
+  sender_address text,
+  sender_city text,
   sender_state text not null,
-  sender_postal_code text not null,
-  sender_country text default 'US',
+  sender_postal_code text,
+  sender_country text default not null 'US',
   
   -- Recipient information
   recipient_name text not null,

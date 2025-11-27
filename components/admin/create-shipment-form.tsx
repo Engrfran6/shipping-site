@@ -263,27 +263,29 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900">Sender Information</h3>
 
-                  <div>
-                    <Label htmlFor="user">Select user</Label>
+                  {(profiles?.length ?? 0) > 0 && (
+                    <div>
+                      <Label htmlFor="user">Select user</Label>
 
-                    <Select
-                      value={user?.id}
-                      onValueChange={(value) =>
-                        setUser(profiles?.find((u) => u.id === value) || null)
-                      }>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a user" />
-                      </SelectTrigger>
+                      <Select
+                        value={user?.id}
+                        onValueChange={(value) =>
+                          setUser(profiles?.find((u) => u.id === value) || null)
+                        }>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a user" />
+                        </SelectTrigger>
 
-                      <SelectContent>
-                        {profiles?.map((user) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {user.full_name || user.email || "Unknown User"}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                        <SelectContent>
+                          {profiles?.map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              {user.full_name || user.email || "Unknown User"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
@@ -670,3 +672,485 @@ export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
     </div>
   );
 }
+
+// "use client";
+
+// import {yupResolver} from "@hookform/resolvers/yup";
+// import {useRouter} from "next/navigation";
+// import {useEffect, useState} from "react";
+// import {FormProvider, useForm} from "react-hook-form";
+// import * as yup from "yup";
+
+// import {Button} from "@/components/ui/button";
+// import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+// import {Input} from "@/components/ui/input";
+// import {Label} from "@/components/ui/label";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+// import {createClient} from "@/lib/supabase/client";
+// import type {Profile} from "@/lib/types/database";
+
+// import {ArrowRight, Package} from "lucide-react";
+
+// // ✅ Validation schema
+// const shipmentSchema = yup.object({
+//   // Step 1 - Addresses
+//   senderName: yup.string().required("Sender name is required"),
+//   senderEmail: yup.string().optional(),
+//   senderAddress: yup.string().optional(),
+//   senderCity: yup.string().optional(),
+//   senderPostalCode: yup.string().optional(),
+//   senderPhone: yup
+//     .string()
+//     .matches(/^[0-9+\- ]+$/, "Invalid phone number")
+//     .required("Sender phone is required"),
+//   senderState: yup.string().required("Sender state is required"),
+//   senderCountry: yup.string().required("Sender country is required"),
+
+//   recipientEmail: yup.string().required("Recipient email is required"),
+//   recipientPostalCode: yup.string().required("Recipient postal code is required"),
+//   recipientPhone: yup.string().required("Recipient phone number is required"),
+//   recipientName: yup.string().required("Recipient name is required"),
+//   recipientAddress: yup.string().required("Recipient address is required"),
+//   recipientCity: yup.string().required("Recipient city is required"),
+//   recipientState: yup.string().required("Recipient state is required"),
+
+//   recipientCountry: yup.string().required("Recipient country is required"),
+
+//   description: yup.string().optional(),
+//   deliveryInstructions: yup.string(),
+//   signatureRequired: yup.boolean(),
+//   insuranceRequired: yup.boolean(),
+
+//   // Step 2 - Package
+//   packageType: yup.string().required("Package type is required"),
+//   weightKg: yup
+//     .number()
+//     .typeError("Weight must be a number")
+//     .positive("Weight must be positive")
+//     .required("Weight is required"),
+//   declaredValue: yup
+//     .number()
+//     .typeError("Declared value must be a number")
+//     .min(0, "Declared value cannot be negative")
+//     .required("Declared value is required"),
+
+//   // Step 3 - Service
+//   serviceType: yup.string().required("Service type is required"),
+// });
+
+// type ShipmentFormData = yup.InferType<typeof shipmentSchema>;
+
+// interface CreateShipmentFormProps {
+//   profiles: Profile[] | null;
+// }
+
+// export function CreateShipmentForm({profiles}: CreateShipmentFormProps) {
+//   const router = useRouter();
+//   const [user, setUser] = useState<Profile | null>(null);
+//   const [step, setStep] = useState(1);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
+
+//   const methods = useForm<ShipmentFormData>({
+//     resolver: yupResolver(shipmentSchema),
+//     defaultValues: {
+//       senderName: "",
+//       senderEmail: "",
+//       senderPhone: "",
+//       senderAddress: "",
+//       senderCity: "",
+//       senderState: "",
+//       senderCountry: "",
+//       senderPostalCode: "",
+//       recipientName: "",
+//       recipientEmail: "",
+//       recipientPhone: "",
+//       recipientAddress: "",
+//       recipientCity: "",
+//       recipientState: "",
+//       recipientCountry: "",
+//       recipientPostalCode: "",
+//       packageType: "",
+//       weightKg: 0,
+//       declaredValue: 0,
+//       description: "",
+//       serviceType: "",
+//       deliveryInstructions: "",
+//       signatureRequired: false,
+//       insuranceRequired: false,
+//     },
+//   });
+
+//   const {
+//     register,
+//     handleSubmit,
+//     setValue,
+//     watch,
+//     trigger,
+//     formState: {errors},
+//   } = methods;
+
+//   const formData = watch();
+
+//   useEffect(() => {
+//     if (user) {
+//       setValue("senderName", user.full_name || "");
+//       setValue("senderEmail", user.email || "");
+//       setValue("senderPhone", user.phone || "");
+//       setValue("senderAddress", user.address || "");
+//       setValue("senderCity", user.city || "");
+//       setValue("senderState", user.state || "");
+//       setValue("senderCountry", user.country || "");
+//       setValue("senderPostalCode", user.postal_code || "");
+//     }
+//   }, [user, setValue]);
+
+//   const nextStep = async () => {
+//     const stepFields =
+//       step === 1
+//         ? [
+//             "senderName",
+//             "senderPhone",
+//             "senderState",
+//             "senderCountry",
+//             "recipientName",
+//             "recipientAddress",
+//             "recipientCity",
+//             "recipientState",
+//             "recipientCountry",
+//           ]
+//         : step === 2
+//         ? ["packageType", "weightKg", "declaredValue"]
+//         : ["serviceType"];
+
+//     const valid = await trigger(stepFields as any);
+//     if (valid) setStep((s) => s + 1);
+//   };
+
+//   const prevStep = () => setStep((s) => s - 1);
+
+//   const onSubmit = async (data: ShipmentFormData) => {
+//     setIsLoading(true);
+//     setError(null);
+
+//     try {
+//       const supabase = createClient();
+
+//       const {data: costData, error: costError} = await supabase.rpc("calculate_shipping_cost", {
+//         p_service_type: data.serviceType.toLowerCase(),
+//         p_weight_kg: Number(data.weightKg),
+//         p_declared_value: Number(data.declaredValue),
+//         p_signature_required: data.signatureRequired,
+//         p_insurance_required: data.insuranceRequired,
+//       });
+
+//       if (costError) throw costError;
+
+//       const {data: trackingData, error: trackingError} = await supabase.rpc(
+//         "generate_tracking_number"
+//       );
+//       if (trackingError) throw trackingError;
+
+//       const {error: shipmentError} = await supabase.from("shipments").insert({
+//         tracking_number: trackingData,
+//         user_id: user?.id ?? null,
+//         sender_name: data.senderName,
+//         sender_email: data.senderEmail,
+//         sender_phone: data.senderPhone,
+//         sender_address: data.senderAddress,
+//         sender_city: data.senderCity,
+//         sender_state: data.senderState,
+//         sender_postal_code: data.senderPostalCode,
+//         sender_country: data.senderCountry,
+//         recipient_name: data.recipientName,
+//         recipient_email: data.recipientEmail,
+//         recipient_phone: data.recipientPhone,
+//         recipient_address: data.recipientAddress,
+//         recipient_city: data.recipientCity,
+//         recipient_state: data.recipientState,
+//         recipient_postal_code: data.recipientPostalCode,
+//         recipient_country: data.recipientCountry,
+//         package_type: data.packageType,
+//         weight_kg: Number(data.weightKg),
+//         declared_value: Number(data.declaredValue),
+//         description: data.description,
+//         service_type: data.serviceType,
+//         delivery_instructions: data.deliveryInstructions,
+//         signature_required: data.signatureRequired,
+//         insurance_required: data.insuranceRequired,
+//         status: "created",
+//         base_cost: costData.base_cost,
+//         insurance_cost: costData.insurance_cost,
+//         total_cost: costData.total_cost,
+//         estimated_delivery_date: new Date(
+//           Date.now() + Number(costData?.estimated_delivery_days || 0) * 24 * 60 * 60 * 1000
+//         ).toISOString(),
+//       });
+
+//       if (shipmentError) throw shipmentError;
+
+//       router.push("/admin/shipments");
+//     } catch (err) {
+//       console.error(err);
+//       setError("Failed to create shipment");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="max-w-2xl mx-auto">
+//       {/* Stepper */}
+//       <div className="mb-6">
+//         <div className="flex items-center justify-between mb-4">
+//           {[1, 2, 3].map((n) => (
+//             <div key={n} className={`flex items-center ${n < 3 ? "flex-1" : ""}`}>
+//               <div
+//                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+//                   step >= n ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"
+//                 }`}>
+//                 {n}
+//               </div>
+//               {n < 3 && (
+//                 <div className={`flex-1 h-1 mx-4 ${step > n ? "bg-blue-600" : "bg-gray-200"}`} />
+//               )}
+//             </div>
+//           ))}
+//         </div>
+//         <div className="text-center text-sm text-gray-600">
+//           Step {step} of 3:{" "}
+//           {step === 1 ? "Addresses" : step === 2 ? "Package Details" : "Service Options"}
+//         </div>
+//       </div>
+
+//       {/* Form */}
+//       <FormProvider {...methods}>
+//         <form onSubmit={handleSubmit(onSubmit)}>
+//           {/* STEP 1 */}
+//           {step === 1 && (
+//             <Card>
+//               <CardHeader>
+//                 <CardTitle>Shipping Addresses</CardTitle>
+//                 <CardDescription>Enter sender and recipient information</CardDescription>
+//               </CardHeader>
+//               <CardContent className="space-y-6">
+//                 <div className="overflow-y-auto max-h-[40vh] space-y-4">
+//                   <h3 className="text-lg font-semibold">Sender Information</h3>
+
+//                   {(profiles?.length ?? 0) > 0 && (
+//                     <div>
+//                       <Label htmlFor="user">Select user</Label>
+//                       <Select
+//                         value={user?.id}
+//                         onValueChange={(value) =>
+//                           setUser(profiles?.find((u) => u.id === value) || null)
+//                         }>
+//                         <SelectTrigger>
+//                           <SelectValue placeholder="Select a user" />
+//                         </SelectTrigger>
+//                         <SelectContent>
+//                           {profiles?.map((u) => (
+//                             <SelectItem key={u.id} value={u.id}>
+//                               {u.full_name || u.email}
+//                             </SelectItem>
+//                           ))}
+//                         </SelectContent>
+//                       </Select>
+//                     </div>
+//                   )}
+
+//                   <div>
+//                     <Label>Full Name</Label>
+//                     <Input {...register("senderName")} />
+//                     {errors.senderName && (
+//                       <p className="text-sm text-red-500">{errors.senderName.message}</p>
+//                     )}
+//                   </div>
+
+//                   <div>
+//                     <Label>Phone</Label>
+//                     <Input {...register("senderPhone")} />
+//                     {errors.senderPhone && (
+//                       <p className="text-sm text-red-500">{errors.senderPhone.message}</p>
+//                     )}
+//                   </div>
+
+//                   <div className="grid md:grid-cols-2 gap-4">
+//                     <div>
+//                       <Label>State</Label>
+//                       <Input {...register("senderState")} />
+//                       {errors.senderState && (
+//                         <p className="text-sm text-red-500">{errors.senderState.message}</p>
+//                       )}
+//                     </div>
+//                     <div>
+//                       <Label>Country</Label>
+//                       <Input {...register("senderCountry")} />
+//                       {errors.senderCountry && (
+//                         <p className="text-sm text-red-500">{errors.senderCountry.message}</p>
+//                       )}
+//                     </div>
+//                   </div>
+
+//                   <h3 className="text-lg font-semibold">Recipient Information</h3>
+//                   <div>
+//                     <Label>Full Name</Label>
+//                     <Input {...register("recipientName")} />
+//                     {errors.recipientName && (
+//                       <p className="text-sm text-red-500">{errors.recipientName.message}</p>
+//                     )}
+//                   </div>
+//                   <div>
+//                     <Label>Address</Label>
+//                     <Input {...register("recipientAddress")} />
+//                     {errors.recipientAddress && (
+//                       <p className="text-sm text-red-500">{errors.recipientAddress.message}</p>
+//                     )}
+//                   </div>
+//                   <div className="grid md:grid-cols-3 gap-4">
+//                     <div>
+//                       <Label>City</Label>
+//                       <Input {...register("recipientCity")} />
+//                       {errors.recipientCity && (
+//                         <p className="text-sm text-red-500">{errors.recipientCity.message}</p>
+//                       )}
+//                     </div>
+//                     <div>
+//                       <Label>State</Label>
+//                       <Input {...register("recipientState")} />
+//                       {errors.recipientState && (
+//                         <p className="text-sm text-red-500">{errors.recipientState.message}</p>
+//                       )}
+//                     </div>
+//                     <div>
+//                       <Label>Country</Label>
+//                       <Input {...register("recipientCountry")} />
+//                       {errors.recipientCountry && (
+//                         <p className="text-sm text-red-500">{errors.recipientCountry.message}</p>
+//                       )}
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 <div className="flex justify-end">
+//                   <Button type="button" onClick={nextStep}>
+//                     Next Step <ArrowRight className="ml-2 h-4 w-4" />
+//                   </Button>
+//                 </div>
+//               </CardContent>
+//             </Card>
+//           )}
+
+//           {/* STEP 2 */}
+//           {step === 2 && (
+//             <Card>
+//               <CardHeader>
+//                 <CardTitle>Package Details</CardTitle>
+//                 <CardDescription>Describe your package</CardDescription>
+//               </CardHeader>
+//               <CardContent className="space-y-6">
+//                 <div>
+//                   <Label>Package Type</Label>
+//                   <Select
+//                     value={formData.packageType}
+//                     onValueChange={(v) => setValue("packageType", v)}>
+//                     <SelectTrigger>
+//                       <SelectValue placeholder="Select package type" />
+//                     </SelectTrigger>
+//                     <SelectContent>
+//                       <SelectItem value="envelope">Envelope</SelectItem>
+//                       <SelectItem value="box">Box</SelectItem>
+//                       <SelectItem value="tube">Tube</SelectItem>
+//                     </SelectContent>
+//                   </Select>
+//                   {errors.packageType && (
+//                     <p className="text-sm text-red-500">{errors.packageType.message}</p>
+//                   )}
+//                 </div>
+
+//                 <div>
+//                   <Label>Weight (kg)</Label>
+//                   <Input type="number" step="0.1" {...register("weightKg")} />
+//                   {errors.weightKg && (
+//                     <p className="text-sm text-red-500">{errors.weightKg.message}</p>
+//                   )}
+//                 </div>
+
+//                 <div>
+//                   <Label>Declared Value ($)</Label>
+//                   <Input type="number" step="0.01" {...register("declaredValue")} />
+//                   {errors.declaredValue && (
+//                     <p className="text-sm text-red-500">{errors.declaredValue.message}</p>
+//                   )}
+//                 </div>
+
+//                 <div className="flex justify-between">
+//                   <Button variant="outline" onClick={prevStep} type="button">
+//                     Previous
+//                   </Button>
+//                   <Button type="button" onClick={nextStep}>
+//                     Next Step <ArrowRight className="ml-2 h-4 w-4" />
+//                   </Button>
+//                 </div>
+//               </CardContent>
+//             </Card>
+//           )}
+
+//           {/* STEP 3 */}
+//           {step === 3 && (
+//             <Card>
+//               <CardHeader>
+//                 <CardTitle>Service Options</CardTitle>
+//                 <CardDescription>Choose your shipping service</CardDescription>
+//               </CardHeader>
+//               <CardContent className="space-y-6">
+//                 <div>
+//                   <Label>Service Type</Label>
+//                   <Select
+//                     value={formData.serviceType}
+//                     onValueChange={(v) => setValue("serviceType", v)}>
+//                     <SelectTrigger>
+//                       <SelectValue placeholder="Select service" />
+//                     </SelectTrigger>
+//                     <SelectContent>
+//                       <SelectItem value="standard">Standard</SelectItem>
+//                       <SelectItem value="express">Express</SelectItem>
+//                       <SelectItem value="overnight">Overnight</SelectItem>
+//                     </SelectContent>
+//                   </Select>
+//                   {errors.serviceType && (
+//                     <p className="text-sm text-red-500">{errors.serviceType.message}</p>
+//                   )}
+//                 </div>
+
+//                 {error && <div className="bg-red-50 text-red-700 p-2 rounded">{error}</div>}
+
+//                 <div className="flex justify-between">
+//                   <Button variant="outline" onClick={prevStep} type="button">
+//                     Previous
+//                   </Button>
+//                   <Button type="submit" disabled={isLoading}>
+//                     {isLoading ? (
+//                       "Creating..."
+//                     ) : (
+//                       <>
+//                         <Package className="mr-2 h-4 w-4" />
+//                         Create Shipment
+//                       </>
+//                     )}
+//                   </Button>
+//                 </div>
+//               </CardContent>
+//             </Card>
+//           )}
+//         </form>
+//       </FormProvider>
+//     </div>
+//   );
+// }
